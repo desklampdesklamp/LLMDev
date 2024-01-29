@@ -29,8 +29,8 @@ def main():
                 
                 response_message = memory.create_message("assistant",response)  
                 messages.append(response_message)
-                # messages_df = pd.DataFrame(messages)
-                # print(messages_df)
+                messages_df = pd.DataFrame(messages)
+                print(messages_df)
                 
                 memory.save_message(messages,filename)
                 print(response)
