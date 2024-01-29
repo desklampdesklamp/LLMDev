@@ -19,12 +19,13 @@ The codebase consists of three primary files:
 To install the necessary libraries, run:
 ```bash
 pip install transformers pandas
+```
 
 ## Usage
 To run the chat application, execute the `app.py` script:
 ```bash
 python app.py
-
+```
 **app.py**
 This script initializes the chat environment and handles the main chat loop. User inputs are taken, processed by the LLM, and responses are generated and displayed. The conversation is saved in JSON format.
 
