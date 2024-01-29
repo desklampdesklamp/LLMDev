@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 
 def load_memory(file_path, default_data=None):
     """
@@ -35,6 +36,7 @@ def load_memory(file_path, default_data=None):
 def save_message(messages, filename):
     """
     Writes a given list to a JSON file. The list must be JSON-serializable.
+    Creates the file or directory if it does not exist.
 
     Parameters:
     messages (list): A list that is JSON serializable.
@@ -48,6 +50,9 @@ def save_message(messages, filename):
     IOError: If there's an issue with file writing.
     """
     try:
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+
         # Writing the JSON-serializable list to a file
         with open(filename, 'w') as file:
             json.dump(messages, file, indent=4)
