@@ -13,12 +13,12 @@ The codebase consists of three primary files:
 3. **memory.py**: Manages the loading and saving of chat messages in JSON format, along with some utility functions for handling messages.
 
 ## Dependencies
-- Python 3.x
-- Libraries: `transformers`, `re`, `os`, `json`, `logging`, `pandas`, `time`
+- Python 3.11.5
+- conda
 
 To install the necessary libraries, run:
 ```bash
-pip install transformers pandas
+conda env create -f environment.yml -n LLMdev
 ```
 
 ## Usage

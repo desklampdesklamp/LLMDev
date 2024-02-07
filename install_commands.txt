@@ -1,0 +1,3 @@
+conda install pytorch pytorch-cuda=12.1 -c pytorch -c nvidia
+pip install transformers
+pip install chardet
