@@ -1,18 +1,40 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
-import re
 import os
-from typing import Tuple
+import torch
 
-def initialize_chat():
-    model = AutoModelForCausalLM.from_pretrained("mistralai/Mistral-7B-Instruct-v0.2")
-    tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.2")
-    device = "cuda"
-    initial_message = []
-    messages = initial_message
-    return messages, model, tokenizer, device
+def initialize_chat(model_name="mistralai/Mistral-7B-Instruct-v0.2", device="auto"):
+    """
+    Initializes the chat model and tokenizer.
+
+    Parameters:
+    - model_name (str): Identifier for the model to be loaded.
+    - device (str): The device to run the model on ("cuda:X", "cpu", or "auto").
+
+    Returns:
+    - tuple: Contains an empty initial message list, the loaded model, tokenizer, and device configuration.
+    """
+    if device == "auto":
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+    else:
+        device = device  # Use the specified device
+
+    model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    return model, tokenizer
 
 def generate_response(messages, model, tokenizer, device):
-    #takes in a message and returns a response
+    """
+    Generates a chat response based on the provided messages.
+
+    Parameters:
+    - messages (list): List of chat messages.
+    - model: The loaded chat model.
+    - tokenizer: The tokenizer for the model.
+    - device (str): The device to run the model on.
+
+    Returns:
+    - str: The generated response.
+    """
     encodeds = tokenizer.apply_chat_template(messages, return_tensors="pt")
     
     input_prompt = tokenizer.batch_decode(encodeds)
@@ -23,43 +45,8 @@ def generate_response(messages, model, tokenizer, device):
 
     generated_ids = model.generate(model_inputs, max_new_tokens=8000, do_sample=True, pad_token_id=tokenizer.eos_token_id)
     decoded = tokenizer.batch_decode(generated_ids)
-    reponse = decoded[0]
+    response = decoded[0]
     
-    assistant_answer = reponse[input_len:-4]
+    assistant_answer = response[input_len:-4]
     
     return assistant_answer
-
-def extract_code(output: str, filename: str = 'code.py', folder: str = 'tools') -> Tuple[bool, str]:
-    """
-    Parses markdown output to extract code blocks and saves them to a specified file in a given folder.
-    
-    Parameters:
-    output (str): Markdown text to parse.
-    filename (str): Name of the file to save the code. Defaults to 'code.py'.
-    folder (str): Folder to save the file. Defaults to 'tools'.
-
-    Returns:
-    Tuple[bool, str]: A tuple containing a boolean indicating success or failure, and a message.
-    """
-    code_pattern = re.compile(r'```(?:\w+\n)?([\s\S]+?)```', re.DOTALL)
-    matches = code_pattern.findall(output)
-
-    if matches:
-        # Create the folder if it doesn't exist
-        os.makedirs(folder, exist_ok=True)
-
-        # Construct the file path
-        file_path = os.path.join(folder, filename)
-
-        try:
-            with open(file_path, 'w') as f:
-                for code in matches:
-                    f.write(code + '\n\n')
-            return True, f'Successfully extracted code blocks to {file_path}.'
-        except IOError as e:
-            return False, f'File writing error: {e}'
-    else:
-        return False, 'No code blocks found in the markdown output.'
-
-
-    return message
